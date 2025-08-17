@@ -32,39 +32,40 @@ function Login() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3>Login</h3>
+      <h3 className="text-4xl">Login</h3>
 
-      <div className="mb-3">
-        <label>Email address</label>
+      <div
+          className="mb-5 gap-2 flex flex-wrap items-center justify-center">
+        <label className="sm:basis-40 text-2xl">Email</label>
         <input
           type="email"
-          className="form-control"
-          placeholder="Enter email"
+          className="input"
+          placeholder="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
       </div>
 
-      <div className="mb-3">
-        <label>Password</label>
+      <div className="mb-5 gap-2 flex flex-wrap items-center justify-center space-x-2">
+        <label className="sm:basis-40 text-2xl">Password</label>
         <input
           type="password"
-          className="form-control"
-          placeholder="Enter password"
+          className="form-control input"
+          placeholder="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
 
-      <div className="d-grid">
-        <button type="submit" className="btn btn-primary">
+      <div className="flex flex-wrap items-center justify-center flex-col gap-2">
+        <button type="submit" className="button-primary w-40 uppercase">
           Submit
         </button>
+      <button className="button-secondary uppercase rounded-lg" onClick={registerlink}>New user ? <br/> Sign Up now!</button>
       </div>
-      <p className="forgot-password text-right" onClick={registerlink}>
-        New user
-      </p>
-      <SignInwithGoogle/>
+
+ <br/>
+      <SignInwithGoogle />
     </form>
   );
 }

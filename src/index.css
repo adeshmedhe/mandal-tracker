@@ -1,6 +1,25 @@
 @import url("https://fonts.googleapis.com/css?family=Fira+Sans:400,500,600,700,800");
 @import "tailwindcss";
 
+
+@layer components {
+    .input {
+        @apply rounded-full border-stone-200 text-sm bg-white p-3 m-3
+        transition-all duration-200 ease-in-out
+    }
+
+    .button-primary {
+        @apply rounded-full text-2xl bg-amber-500 focus:bg-amber-300 transition
+        duration-200 ease-in-out focus:ring-1 focus:ring-offset-2 p-3 m-2
+    }
+
+    .button-secondary {
+        @apply rounded-full text-xl bg-sky-600 focus:bg-sky-400 transition
+        duration-200 ease-in-out focus:ring-1 focus:ring-offset-2 p-3 m-2
+    }
+
+}
+
 * {
     box-sizing: border-box;
 }

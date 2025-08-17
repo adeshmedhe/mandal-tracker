@@ -30,7 +30,7 @@ function SignInwithGoogle() {
         style={{ display: "flex", justifyContent: "center", cursor: "pointer" }}
         onClick={googleLogin}
       >
-        <img src={"src/google.png"} className="w-46" />
+        <img src={"src/google.png"} className="w-xs"/>
       </div>
     </div>
   );
