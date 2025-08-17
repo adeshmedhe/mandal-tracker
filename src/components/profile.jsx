@@ -36,6 +36,8 @@ function Profile() {
   const [loading, setLoading] = useState(false);
   const [donations, setDonations] = useState([]);
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // You can change this value
 
   // Fetch user data
   const fetchUserData = async () => {
@@ -114,6 +116,13 @@ function Profile() {
     await deleteDoc(doc(db, "donations", id));
     await fetchDonations();
   };
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredDonations.length / itemsPerPage);
+  const paginatedDonations = filteredDonations.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div
@@ -262,14 +271,14 @@ function Profile() {
                 </tr>
               </thead>
               <tbody>
-                {filteredDonations.length === 0 ? (
+                {paginatedDonations.length === 0 ? (
                   <tr>
                     <td colSpan={5} style={{ textAlign: "center", padding: 40, color: "#aaa" }}>
                       No donations found.
                     </td>
                   </tr>
                 ) : (
-                  filteredDonations.map((d) => (
+                  paginatedDonations.map((d) => (
                     <tr key={d.id} style={{ borderTop: "1px solid #f0f0f0" }}>
                       <td style={{ padding: "16px 36px", display: "flex", alignItems: "center", gap: 14 }}>
                         <span
@@ -338,6 +347,60 @@ function Profile() {
                 )}
               </tbody>
             </table>
+
+            {/* Pagination */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "16px 36px",
+                background: "#f9f9fb",
+                borderTop: "1px solid #e0e7ef",
+              }}
+            >
+              <div style={{ color: "#555", fontSize: 16 }}>
+                Page{" "}
+                <strong>
+                  {currentPage} of {totalPages}
+                </strong>
+              </div>
+              <div>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: 6,
+                    background: "#e0e7ef",
+                    color: "#333",
+                    border: "none",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    marginRight: 8,
+                    opacity: currentPage === 1 ? 0.6 : 1,
+                  }}
+                >
+                  ◀ Previous
+                </button>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: 6,
+                    background: "#22c55e",
+                    color: "#fff",
+                    border: "none",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    opacity: currentPage === totalPages ? 0.6 : 1,
+                  }}
+                >
+                  Next ▶
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Modal for adding donation */}

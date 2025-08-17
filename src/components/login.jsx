@@ -26,6 +26,10 @@ function Login() {
     }
   };
 
+  const registerlink = () => {
+    window.location.href = "/register";
+  }
+
   return (
     <form onSubmit={handleSubmit}>
       <h3>Login</h3>
@@ -57,8 +61,8 @@ function Login() {
           Submit
         </button>
       </div>
-      <p className="forgot-password text-right">
-        New user <a href="/src/components/register">Register Here</a>
+      <p className="forgot-password text-right" onClick={registerlink}>
+        New user
       </p>
       <SignInwithGoogle/>
     </form>
