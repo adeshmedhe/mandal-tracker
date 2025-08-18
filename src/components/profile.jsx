@@ -11,7 +11,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import "./profile.css";
-
+import ganpatiBappa from "../assets/ganpati-bappa.png";
 function formatDateTime(iso) {
   const date = new Date(iso);
   return (
@@ -157,13 +157,7 @@ function Profile() {
             flexWrap: "wrap",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-              <img
-                src=".src/assets/ganpati-bappa.png"
-                width={72}
-                height={72}
-                style={{ borderRadius: "50%", background: "#e3eaff" }}
-                alt="User"
-              />
+              <img src={ganpatiBappa} alt="Ganpati Bappa" style={{ width: 100 ,height: 100, marginRight: 16 }} />
               <div>
                 <h2 style={{ margin: 0, fontWeight: 800, fontSize: 28 }}>
                   Welcome, {userDetails.firstName}
