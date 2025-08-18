@@ -10,6 +10,7 @@ import {
   orderBy,
   deleteDoc,
 } from "firebase/firestore";
+import "./profile.css";
 
 function formatDateTime(iso) {
   const date = new Date(iso);
@@ -37,9 +38,8 @@ function Profile() {
   const [donations, setDonations] = useState([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // You can change this value
+  const itemsPerPage = 10;
 
-  // Fetch user data
   const fetchUserData = async () => {
     auth.onAuthStateChanged(async (user) => {
       if (!user) return;
@@ -50,8 +50,6 @@ function Profile() {
       }
     });
   };
-
-  // Fetch donations
   const fetchDonations = async () => {
     const q = query(collection(db, "donations"), orderBy("date", "desc"));
     const querySnapshot = await getDocs(q);
@@ -66,7 +64,25 @@ function Profile() {
   useEffect(() => {
     fetchUserData();
     fetchDonations();
-    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    let timer;
+    const resetTimer = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        auth.signOut();
+        window.location.href = "/login";
+      }, 30 * 60 * 1000);
+    };
+    window.addEventListener("mousemove", resetTimer);
+    window.addEventListener("keydown", resetTimer);
+    resetTimer();
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("mousemove", resetTimer);
+      window.removeEventListener("keydown", resetTimer);
+    };
   }, []);
 
   async function handleLogout() {
@@ -99,8 +115,6 @@ function Profile() {
     }
     setLoading(false);
   };
-
-  // Filter donations by search
   const filteredDonations = donations.filter((d) => {
     const s = search.toLowerCase();
     return (
@@ -109,15 +123,11 @@ function Profile() {
       String(d.amount).includes(s)
     );
   });
-
-  // Delete donation
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this donation?")) return;
     await deleteDoc(doc(db, "donations", id));
     await fetchDonations();
   };
-
-  // Pagination logic
   const totalPages = Math.ceil(filteredDonations.length / itemsPerPage);
   const paginatedDonations = filteredDonations.slice(
     (currentPage - 1) * itemsPerPage,
@@ -133,27 +143,19 @@ function Profile() {
       }}
     >
       {userDetails ? (
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            background: "none",
-            padding: "0 24px",
-          }}
-        >
+        <div className="profile-container">
           {/* Header */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              background: "#fff",
-              borderRadius: 18,
-              padding: "36px 48px",
-              marginBottom: 40,
-              boxShadow: "0 4px 32px #0001",
-            }}
-          >
+          <div className="profile-header" style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: "#fff",
+            borderRadius: 18,
+            padding: "36px 48px",
+            marginBottom: 40,
+            boxShadow: "0 4px 32px #0001",
+            flexWrap: "wrap",
+          }}>
             <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
               <img
                 src=".src/assets/ganpati-bappa.png"
@@ -245,19 +247,24 @@ function Profile() {
           </div>
 
           {/* Donation Table */}
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: 16,
-              boxShadow: "0 4px 24px #0001",
-              padding: 0,
-              overflow: "hidden",
-            }}
-          >
+          <div className="profile-table" style={{
+            background: "#fff",
+            borderRadius: 16,
+            boxShadow: "0 4px 24px #0001",
+            padding: 0,
+            overflow: "auto",
+          }}>
             <div style={{ padding: "28px 36px 0 36px" }}>
               <h3 style={{ margin: 0, fontWeight: 800, fontSize: 22 }}>Donation Records</h3>
               <div style={{ color: "#888", fontSize: 16, marginBottom: 18 }}>
                 Manage and track all donation transactions
+              </div>
+              {/* Total Amount */}
+              <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", margin: "16px 0 8px 0" }}>
+                <span style={{ fontWeight: 700, fontSize: 18 }}>
+                  Total: ₹
+                  {filteredDonations.reduce((sum, d) => sum + Number(d.amount), 0).toFixed(2)}
+                </span>
               </div>
             </div>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 17 }}>
@@ -301,7 +308,7 @@ function Profile() {
                       </td>
                       <td style={{ fontWeight: 500 }}>{d.receiverName}</td>
                       <td style={{ color: "#16a34a", fontWeight: 800 }}>
-                        ${Number(d.amount).toFixed(2)}
+                        ₹{Number(d.amount).toFixed(2)}
                       </td>
                       <td style={{ fontWeight: 500 }}>
                         {formatDateTime(d.date)}
@@ -347,7 +354,6 @@ function Profile() {
                 )}
               </tbody>
             </table>
-
             {/* Pagination */}
             <div
               style={{
