@@ -1,32 +1,53 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "./firebase.jsx";
 import { setDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
+import "./register.css";
 
 function Register() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fname, setFname] = useState("");
-  const [lname, setLname] = useState("");
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    name: "",
+  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleRegister = async (e) => {
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError("");
+    setSuccess("");
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.email || !form.password || !form.confirmPassword || !form.name) {
+      setError("Please fill all fields.");
+      return;
+    }
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      await createUserWithEmailAndPassword(auth, form.email, form.password);
       const user = auth.currentUser;
       console.log(user);
       if (user) {
         await setDoc(doc(db, "users", user.uid), {
           email: user.email,
-          firstName: fname,
-          lastName: lname
+          name: form.name,
         });
       }
       console.log("User Registered Successfully!!");
       toast.success("User Registered Successfully!!", {
         position: "top-center",
       });
+      setSuccess("Registration successful! You can now log in.");
+      setForm({ email: "", password: "", confirmPassword: "", name: "" });
     } catch (error) {
       console.log(error.message);
       toast.error(error.message, {
@@ -36,61 +57,68 @@ function Register() {
   };
 
   return (
-    <form onSubmit={handleRegister}>
-      <h3>Sign Up</h3>
-
-      <div className="mb-3">
-        <label>First name</label>
-        <input
-          type="text"
-          className="form-control"
-          placeholder="First name"
-          onChange={(e) => setFname(e.target.value)}
-          required
-        />
-      </div>
-
-      <div className="mb-3">
-        <label>Last name</label>
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Last name"
-          onChange={(e) => setLname(e.target.value)}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label>Email address</label>
-        <input
-          type="email"
-          className="form-control"
-          placeholder="Enter email"
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-
-      <div className="mb-3">
-        <label>Password</label>
-        <input
-          type="password"
-          className="form-control"
-          placeholder="Enter password"
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
-
-      <div className="d-grid">
-        <button type="submit" className="btn btn-primary">
+    <div className="signup-container">
+      <div className="signup-title">Sign Up</div>
+      {error && <div className="signup-error">{error}</div>}
+      {success && <div className="signup-success">{success}</div>}
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label className="signup-label">Full Name</label>
+          <input
+            className="signup-input"
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Enter your name"
+            autoComplete="off"
+          />
+        </div>
+        <div>
+          <label className="signup-label">Email</label>
+          <input
+            className="signup-input"
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="Enter your email"
+            autoComplete="off"
+          />
+        </div>
+        <div>
+          <label className="signup-label">Password</label>
+          <input
+            className="signup-input"
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            placeholder="Enter password"
+            autoComplete="new-password"
+          />
+        </div>
+        <div>
+          <label className="signup-label">Confirm Password</label>
+          <input
+            className="signup-input"
+            type="password"
+            name="confirmPassword"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            placeholder="Confirm password"
+            autoComplete="new-password"
+          />
+        </div>
+        <button className="signup-btn" type="submit">
           Sign Up
         </button>
-      </div>
-      <p className="forgot-password text-right">
-        Already registered <a href="/login">Login</a>
-      </p>
-    </form>
+      </form>
+      <Link className="signup-link" to="/login">
+        Already have an account? Login
+      </Link>
+    </div>
   );
 }
+
 export default Register;
